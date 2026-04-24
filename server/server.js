@@ -1,14 +1,11 @@
-const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config(); // ✅ MUST BE FIRST
+
+const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const connectDB = require("./config/database");
-const errorHandler = require("./middleware/errorHandler");
 
-// Load environment variables
-dotenv.config();
-
-// Connect to database
 connectDB();
 
 const app = express();
@@ -17,7 +14,10 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL || [
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
     credentials: true,
   }),
 );
