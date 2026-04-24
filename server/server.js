@@ -57,6 +57,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/products", require("./routes/products"));
 app.use("/api/quotes", require("./routes/quotes"));
 app.use("/api/messages", require("./routes/messages"));
+const errorHandler = require("./middleware/errorHandler");
 
 // Error handler (must be after routes)
 app.use(errorHandler);
