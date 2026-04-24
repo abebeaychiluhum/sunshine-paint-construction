@@ -1,10 +1,12 @@
-const dotenv = require("dotenv");
-dotenv.config(); // ✅ MUST BE FIRST
-
 const express = require("express");
+const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const connectDB = require("./config/database");
+const errorHandler = require("./middleware/errorHandler");
+
+// Load environment variables
+dotenv.config();
 
 // Connect to database
 connectDB();
@@ -12,7 +14,7 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(helmet()); // Security headers
+app.use(helmet());
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -22,7 +24,13 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Simple route for testing
+// Routes
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/products", require("./routes/products"));
+app.use("/api/quotes", require("./routes/quotes"));
+app.use("/api/messages", require("./routes/messages"));
+
+// Test route
 app.get("/api/test", (req, res) => {
   res.json({
     success: true,
@@ -43,14 +51,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Server Error",
-    error: process.env.NODE_ENV === "development" ? err : {},
-  });
-});
+app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
