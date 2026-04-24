@@ -20,6 +20,7 @@ import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Projects from "./pages/Projects";
 import Blog from "./pages/Blog";
+import Portal from "./pages/Portal";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/projects" element={<Projects />} />
                   <Route path="/blog" element={<Blog />} />
+                  <Route path="/portal" element={<Portal />} />
                 </Routes>
               </main>
 
