@@ -7,10 +7,12 @@ import {
   FaPlus,
   FaShoppingBag,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useCurrency } from "../context/CurrencyContext";
 
 const CartDrawer = () => {
+  const navigate = useNavigate();
   const {
     cartItems,
     isCartOpen,
@@ -20,6 +22,16 @@ const CartDrawer = () => {
     getCartTotal,
   } = useCart();
   const { formatPrice } = useCurrency();
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    navigate("/checkout");
+  };
+
+  const handleViewCart = () => {
+    setIsCartOpen(false);
+    navigate("/cart");
+  };
 
   return (
     <AnimatePresence>
@@ -102,9 +114,9 @@ const CartDrawer = () => {
                       <div className="flex space-x-4">
                         {/* Product Image */}
                         <div className="w-20 h-20 bg-secondary-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {item.image ? (
+                          {item.images && item.images[0] ? (
                             <img
-                              src={item.image}
+                              src={item.images[0].url}
                               alt={item.name}
                               className="w-full h-full object-cover"
                             />
@@ -196,13 +208,25 @@ const CartDrawer = () => {
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  Proceed to Checkout
-                </motion.button>
+                <div className="space-y-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleCheckout}
+                    className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+                  >
+                    Proceed to Checkout
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleViewCart}
+                    className="w-full py-3 bg-white border-2 border-secondary-300 text-secondary-900 rounded-lg font-semibold hover:bg-secondary-50 transition-colors"
+                  >
+                    View Full Cart
+                  </motion.button>
+                </div>
               </div>
             )}
           </motion.div>
