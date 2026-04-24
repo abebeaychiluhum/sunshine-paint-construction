@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import { CartProvider } from "./context/CartContext";
 import { QuoteProvider } from "./context/QuoteContext";
@@ -11,6 +11,7 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import CartDrawer from "./components/CartDrawer";
 import CartButton from "./components/CartButton";
 import Home from "./pages/Home";
+import Products from "./pages/Products";
 
 function App() {
   return (
@@ -23,7 +24,10 @@ function App() {
               <Navbar />
 
               <main className="flex-1">
-                <Home />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                </Routes>
               </main>
 
               <Footer />
