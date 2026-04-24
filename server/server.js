@@ -24,11 +24,13 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/products", require("./routes/products"));
-app.use("/api/quotes", require("./routes/quotes"));
-app.use("/api/messages", require("./routes/messages"));
+// Log requests in development
+if (process.env.NODE_ENV === "development") {
+  app.use((req, res, next) => {
+    console.log(`📨 ${req.method} ${req.url}`);
+    next();
+  });
+}
 
 // Test route
 app.get("/api/test", (req, res) => {
@@ -50,23 +52,47 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Error handler
+// Mount API routes
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/products", require("./routes/products"));
+app.use("/api/quotes", require("./routes/quotes"));
+app.use("/api/messages", require("./routes/messages"));
+
+// Error handler (must be after routes)
 app.use(errorHandler);
 
-// 404 handler
+// 404 handler (must be last)
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: "Route not found",
+    message: `Route not found: ${req.method} ${req.url}`,
   });
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  console.log("");
   console.log("🚀 ====================================");
-  console.log(`✨ Server running in ${process.env.NODE_ENV} mode`);
+  console.log(
+    `✨ Server running in ${process.env.NODE_ENV || "development"} mode`,
+  );
   console.log(`🌐 Server is running on port ${PORT}`);
   console.log(`📡 API URL: http://localhost:${PORT}/api`);
+  console.log("");
+  console.log("📍 Available Routes:");
+  console.log("   POST   /api/auth/register");
+  console.log("   POST   /api/auth/login");
+  console.log("   GET    /api/auth/me");
+  console.log("   GET    /api/products");
+  console.log("   POST   /api/quotes");
+  console.log("   POST   /api/messages");
   console.log("🚀 ====================================");
+  console.log("");
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (err) => {
+  console.log(`❌ Error: ${err.message}`);
+  server.close(() => process.exit(1));
 });

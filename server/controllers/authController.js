@@ -40,7 +40,11 @@ exports.register = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(error);
+    console.error("Register Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server Error",
+    });
   }
 };
 
@@ -49,6 +53,8 @@ exports.register = async (req, res, next) => {
 // @access  Public
 exports.login = async (req, res, next) => {
   try {
+    console.log("Login attempt:", req.body);
+
     const { email, password } = req.body;
 
     // Validate email & password
@@ -61,6 +67,7 @@ exports.login = async (req, res, next) => {
 
     // Check for user
     const user = await User.findOne({ email }).select("+password");
+    console.log("User found:", user ? "Yes" : "No");
 
     if (!user) {
       return res.status(401).json({
@@ -71,6 +78,7 @@ exports.login = async (req, res, next) => {
 
     // Check if password matches
     const isMatch = await user.matchPassword(password);
+    console.log("Password match:", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({
@@ -107,7 +115,11 @@ exports.login = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(error);
+    console.error("Login Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server Error",
+    });
   }
 };
 
@@ -123,7 +135,10 @@ exports.getMe = async (req, res, next) => {
       user,
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -151,7 +166,10 @@ exports.updateProfile = async (req, res, next) => {
       user,
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -181,6 +199,9 @@ exports.updatePassword = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
