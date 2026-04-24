@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { CURRENCIES } from "../utils/constants";
+import { CURRENCIES, DEFAULT_CURRENCY } from "../utils/constants";
 
 const CurrencyContext = createContext();
 
@@ -14,7 +14,7 @@ export const useCurrency = () => {
 export const CurrencyProvider = ({ children }) => {
   const [currency, setCurrency] = useState(() => {
     const saved = localStorage.getItem("selectedCurrency");
-    return saved ? JSON.parse(saved) : CURRENCIES[0];
+    return saved ? JSON.parse(saved) : DEFAULT_CURRENCY; // Default to ETB
   });
 
   useEffect(() => {

@@ -23,6 +23,9 @@ export const CURRENCIES = [
   { code: "EUR", symbol: "€", name: "Euro", rate: 0.017 },
 ];
 
+// Set ETB as default
+export const DEFAULT_CURRENCY = CURRENCIES[0]; // ETB
+
 export const PRODUCT_CATEGORIES = [
   "Paint & Coatings",
   "Tiles & Flooring",

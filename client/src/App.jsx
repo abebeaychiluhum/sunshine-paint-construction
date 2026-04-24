@@ -21,6 +21,7 @@ import Contact from "./pages/Contact";
 import Projects from "./pages/Projects";
 import Blog from "./pages/Blog";
 import Portal from "./pages/Portal";
+import Cart from "./pages/Cart";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                   <Route path="/projects" element={<Projects />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/portal" element={<Portal />} />
+                  <Route path="/cart" element={<Cart />} />
                 </Routes>
               </main>
 
