@@ -34,6 +34,7 @@ const quoteSchema = new mongoose.Schema(
         "Industrial",
         "Renovation",
         "New Construction",
+        "Interior Design",
         "Other",
       ],
     },

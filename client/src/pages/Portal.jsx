@@ -860,7 +860,7 @@ const OverviewTab = ({ user, formatPrice }) => {
         </Link>
 
         <Link
-          to="/contact"
+          to="/quote"
           className="block bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl p-6 text-white hover:shadow-2xl transition-shadow"
         >
           <FaFileInvoice className="text-4xl mb-3" />

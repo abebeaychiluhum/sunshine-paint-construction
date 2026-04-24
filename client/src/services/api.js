@@ -37,6 +37,7 @@ export const updateProfile = (data) => api.put("/auth/profile", data);
 
 // Quotes
 export const createQuote = (quoteData) => api.post("/quotes", quoteData);
+export const getQuotes = (params) => api.get("/quotes", { params });
 
 // Messages
 export const sendMessage = (messageData) => api.post("/messages", messageData);

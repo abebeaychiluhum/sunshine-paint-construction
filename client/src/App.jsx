@@ -23,6 +23,7 @@ import Blog from "./pages/Blog";
 import Portal from "./pages/Portal";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Quote from "./pages/Quote";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
                   <Route path="/portal" element={<Portal />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/quote" element={<Quote />} />
                 </Routes>
               </main>
 

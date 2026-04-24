@@ -11,6 +11,7 @@ import {
   FaSearch,
   FaShoppingCart,
   FaUser,
+  FaFileInvoice,
 } from "react-icons/fa";
 import { COMPANY_INFO, SOCIAL_LINKS } from "../utils/constants";
 import { useCart } from "../context/CartContext";
@@ -246,6 +247,15 @@ const Navbar = () => {
                     {getCartCount()}
                   </motion.span>
                 )}
+              </Link>
+
+              {/* User/Quote button */}
+              <Link
+                to="/quote"
+                className="hidden lg:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <FaFileInvoice className="w-4 h-4" />
+                <span>Request Quote</span>
               </Link>
 
               {/* User/Portal Button */}
