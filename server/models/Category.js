@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       unique: true,
+      trim: true,
     },
     description: {
       type: String,
@@ -32,13 +33,25 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     displayOrder: {
       type: Number,
       default: 0,
     },
-    isFeatured: {
-      type: Boolean,
-      default: false,
+    productCount: {
+      type: Number,
+      default: 0,
+    },
+    metaTitle: String,
+    metaDescription: String,
+    metaKeywords: [String],
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null,
     },
   },
   {
@@ -58,5 +71,11 @@ categorySchema.pre("save", function (next) {
   }
   next();
 });
+
+// Index for efficient queries
+//categorySchema.index({ slug: 1 });
+categorySchema.index({ isActive: 1, displayOrder: 1 });
+categorySchema.index({ parent: 1 });
+categorySchema.index({ name: "text", description: "text" });
 
 module.exports = mongoose.model("Category", categorySchema);
