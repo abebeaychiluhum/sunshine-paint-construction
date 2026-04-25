@@ -57,8 +57,10 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/products", require("./routes/products"));
 app.use("/api/quotes", require("./routes/quotes"));
 app.use("/api/messages", require("./routes/messages"));
-const errorHandler = require("./middleware/errorHandler");
 app.use("/api/users", require("./routes/users"));
+app.use("/api/blogs", require("./routes/blogs"));
+
+const errorHandler = require("./middleware/errorHandler");
 
 // Error handler (must be after routes)
 app.use(errorHandler);
@@ -130,6 +132,7 @@ const server = app.listen(PORT, () => {
   console.log("");
   console.log("🚀 ====================================");
   console.log("");
+  console.log("✅ Blogs routes mounted");
 });
 
 // Handle unhandled promise rejections

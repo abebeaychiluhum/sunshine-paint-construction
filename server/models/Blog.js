@@ -8,11 +8,13 @@ const blogSchema = new mongoose.Schema(
       required: [true, "Please provide a blog title"],
       trim: true,
       maxlength: [200, "Title cannot exceed 200 characters"],
+      unique: true,
     },
     slug: {
       type: String,
       lowercase: true,
       unique: true,
+      trim: true,
     },
     content: {
       type: String,
@@ -35,8 +37,14 @@ const blogSchema = new mongoose.Schema(
     category: {
       type: String,
       trim: true,
+      default: "General",
     },
-    tags: [String],
+    tags: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     status: {
       type: String,
       enum: ["draft", "published", "archived"],
@@ -57,6 +65,11 @@ const blogSchema = new mongoose.Schema(
     metaTitle: String,
     metaDescription: String,
     metaKeywords: [String],
+    publishedAt: Date,
+    publishedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
@@ -78,9 +91,17 @@ blogSchema.pre("save", function (next) {
 
 // Calculate read time (approx 200 words per minute)
 blogSchema.pre("save", function (next) {
-  const wordCount = this.content.split(/\s+/).length;
-  this.readTime = Math.ceil(wordCount / 200);
+  if (this.isModified("content")) {
+    const wordCount = this.content.split(/\s+/).length;
+    this.readTime = Math.ceil(wordCount / 200);
+  }
   next();
 });
+
+// Index for efficient queries
+blogSchema.index({ status: 1, createdAt: -1 });
+//blogSchema.index({ slug: 1 });
+blogSchema.index({ author: 1 });
+blogSchema.index({ title: "text", content: "text", tags: "text" });
 
 module.exports = mongoose.model("Blog", blogSchema);
