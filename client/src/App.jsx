@@ -27,6 +27,7 @@ import Quote from "./pages/Quote";
 
 //Admin Pages
 import Login from "./admin/pages/Login";
+import Dashboard from "./admin/pages/Dashboard";
 import AdminRoute from "./admin/components/AdminRoute";
 
 function App() {
@@ -55,11 +56,14 @@ function App() {
                   <Route path="/quote" element={<Quote />} />
                   <Route path="/admin/login" element={<Login />} />
                   // Admin protected routes
-                  <Route path="/admin" element={<AdminRoute />}>
-                    <Route path="/admin/dashboard" element={<Dashboard />} />
-                    <Route path="/admin/products" element={<AdminProducts />} />
-                    <Route path="/admin/orders" element={<AdminOrders />} />
-                  </Route>
+                  <Route
+                    path="/admin/dashboard"
+                    element={
+                      <AdminRoute>
+                        <Dashboard />
+                      </AdminRoute>
+                    }
+                  />
                 </Routes>
               </main>
 
