@@ -6,6 +6,7 @@ const {
   getMessage,
   replyMessage,
   deleteMessage,
+  getMessageStats,
 } = require("../controllers/messageController");
 const { protect, authorize } = require("../middleware/auth"); // ADD THIS
 

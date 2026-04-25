@@ -6,6 +6,7 @@ const {
   getQuote,
   updateQuote,
   addNote,
+  getQuoteStats,
 } = require("../controllers/quoteController");
 const { protect, authorize } = require("../middleware/auth");
 
