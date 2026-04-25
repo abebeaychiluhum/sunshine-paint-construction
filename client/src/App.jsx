@@ -29,6 +29,7 @@ import Quote from "./pages/Quote";
 import Login from "./admin/pages/Login";
 import Dashboard from "./admin/pages/Dashboard";
 import AdminRoute from "./admin/components/AdminRoute";
+import AdminProducts from "./admin/pages/AdminProducts";
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
                     element={
                       <AdminRoute>
                         <Dashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/products"
+                    element={
+                      <AdminRoute>
+                        <AdminProducts />
                       </AdminRoute>
                     }
                   />
