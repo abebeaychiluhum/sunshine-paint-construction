@@ -15,6 +15,8 @@ import {
   FaClock,
 } from "react-icons/fa";
 import AdminLayout from "../components/AdminLayout";
+import Loader from "../components/Loader";
+import { showNotification } from "../components/Notification";
 import API from "../../services/api";
 
 const StatCard = ({ title, value, icon, color, link, badge }) => {
@@ -47,7 +49,9 @@ const StatCard = ({ title, value, icon, color, link, badge }) => {
             </span>
           )}
         </div>
-        <h3 className="text-2xl font-bold text-secondary-900 mb-1">{value}</h3>
+        <h3 className="text-2xl font-bold text-secondary-900 mb-1">
+          {typeof value === "number" ? value.toLocaleString() : value}
+        </h3>
         <p className="text-sm text-secondary-500">{title}</p>
       </Link>
     </motion.div>
@@ -55,102 +59,82 @@ const StatCard = ({ title, value, icon, color, link, badge }) => {
 };
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    products: 0,
-    messages: 0,
-    unreadMessages: 0,
-    quotes: 0,
-    pendingQuotes: 0,
-    blogs: 0,
-    totalUsers: 0,
-    totalOrders: 0,
-    pageViews: 0,
-    pendingOrders: 0,
-  });
+  const [stats, setStats] = useState(null);
   const [recentMessages, setRecentMessages] = useState([]);
   const [recentQuotes, setRecentQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Get auth token from localStorage
+  const getAuthHeader = () => ({
+    headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+  });
+
+  // Fetch dashboard data
   const fetchDashboardData = useCallback(async () => {
     try {
-      // Adjust these API endpoints based on your actual API
-      const [
-        productsRes,
-        messagesRes,
-        quotesRes,
-        blogsRes,
-        usersRes,
-        ordersRes,
-      ] = await Promise.all([
-        API.get("/products").catch(() => ({ data: [] })),
-        API.get("/messages").catch(() => ({ data: [] })),
-        API.get("/quotes").catch(() => ({ data: [] })),
-        API.get("/blogs").catch(() => ({ data: [] })),
-        API.get("/users").catch(() => ({ data: [] })),
-        API.get("/orders").catch(() => ({ data: [] })),
-      ]);
+      setLoading(true);
 
-      const messages = messagesRes.data?.data || messagesRes.data || [];
-      const quotes = quotesRes.data?.data || quotesRes.data || [];
-      const products = productsRes.data?.data || productsRes.data || [];
-      const blogs = blogsRes.data?.data || blogsRes.data || [];
-      const users = usersRes.data?.data || usersRes.data || [];
-      const orders = ordersRes.data?.data || ordersRes.data || [];
+      // Fetch overview statistics from analytics
+      const analyticsRes = await API.get(
+        "/analytics/overview",
+        getAuthHeader(),
+      );
 
-      setStats({
-        products: Array.isArray(products) ? products.length : 0,
-        messages: Array.isArray(messages) ? messages.length : 0,
-        unreadMessages: Array.isArray(messages)
-          ? messages.filter((m) => !m.read).length
-          : 0,
-        quotes: Array.isArray(quotes) ? quotes.length : 0,
-        pendingQuotes: Array.isArray(quotes)
-          ? quotes.filter((q) => q.status === "Pending").length
-          : 0,
-        blogs: Array.isArray(blogs) ? blogs.length : 0,
-        totalUsers: Array.isArray(users) ? users.length : 0,
-        totalOrders: Array.isArray(orders) ? orders.length : 0,
-        pageViews: Math.floor(Math.random() * 10000) + 5000, // Demo data
-        pendingOrders: Array.isArray(orders)
-          ? orders.filter((o) => o.status === "Pending").length
-          : 0,
-      });
+      // Fetch recent messages
+      const messagesRes = await API.get(
+        "/messages?page=1&limit=5",
+        getAuthHeader(),
+      );
 
-      setRecentMessages(Array.isArray(messages) ? messages.slice(0, 5) : []);
-      setRecentQuotes(Array.isArray(quotes) ? quotes.slice(0, 5) : []);
+      // Fetch recent quotes
+      const quotesRes = await API.get(
+        "/quotes?page=1&limit=5",
+        getAuthHeader(),
+      );
+
+      setStats(analyticsRes.data.data);
+      setRecentMessages(messagesRes.data.messages || []);
+      setRecentQuotes(quotesRes.data.quotes || []);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
+      showNotification("error", "Failed to load dashboard data");
+
       // Set default empty values
       setStats({
-        products: 0,
-        messages: 0,
-        unreadMessages: 0,
-        quotes: 0,
-        pendingQuotes: 0,
-        blogs: 0,
-        totalUsers: 0,
-        totalOrders: 0,
-        pageViews: 0,
-        pendingOrders: 0,
+        products: {
+          total: 0,
+          active: 0,
+          featured: 0,
+          outOfStock: 0,
+          lowStock: 0,
+        },
+        users: { total: 0, admins: 0, regularUsers: 0, active: 0 },
+        messages: { total: 0, unread: 0, replied: 0 },
+        quotes: { total: 0, pending: 0, quoted: 0, accepted: 0 },
+        blogs: { total: 0, published: 0, draft: 0, totalViews: 0 },
+        categories: { total: 0, active: 0 },
       });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Initial fetch
   useEffect(() => {
     fetchDashboardData();
-    // Optional: Setup auto-refresh every 30 seconds
+    // Auto-refresh every 30 seconds
     const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
 
   const statusColors = {
     Pending: "bg-amber-100 text-amber-700",
+    pending: "bg-amber-100 text-amber-700",
     Reviewed: "bg-blue-100 text-blue-700",
+    reviewing: "bg-blue-100 text-blue-700",
     Quoted: "bg-purple-100 text-purple-700",
+    quoted: "bg-purple-100 text-purple-700",
     Closed: "bg-green-100 text-green-700",
+    accepted: "bg-green-100 text-green-700",
   };
 
   const containerVariants = {
@@ -171,6 +155,14 @@ const Dashboard = () => {
       transition: { duration: 0.5 },
     },
   };
+
+  if (!stats) {
+    return (
+      <AdminLayout>
+        <Loader fullScreen={false} />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -216,7 +208,7 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Total Products"
-                value={stats.products}
+                value={stats.products.total}
                 icon={<FaBoxes />}
                 color="gold"
                 link="/admin/products"
@@ -225,27 +217,27 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Total Messages"
-                value={stats.messages}
+                value={stats.messages.total}
                 icon={<FaEnvelope />}
                 color="blue"
                 link="/admin/messages"
-                badge={stats.unreadMessages}
+                badge={stats.messages.unread}
               />
             </motion.div>
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Quote Requests"
-                value={stats.quotes}
+                value={stats.quotes.total}
                 icon={<FaFileInvoiceDollar />}
                 color="amber"
                 link="/admin/quotes"
-                badge={stats.pendingQuotes}
+                badge={stats.quotes.pending}
               />
             </motion.div>
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Blog Posts"
-                value={stats.blogs}
+                value={stats.blogs.total}
                 icon={<FaBlog />}
                 color="purple"
                 link="/admin/blog"
@@ -254,7 +246,7 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Total Users"
-                value={stats.totalUsers}
+                value={stats.users.total}
                 icon={<FaUsers />}
                 color="cyan"
                 link="/admin/users"
@@ -263,11 +255,10 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Total Orders"
-                value={stats.totalOrders}
+                value={stats.products.total}
                 icon={<FaShoppingCart />}
                 color="green"
-                link="/admin/orders"
-                badge={stats.pendingOrders}
+                link="/admin/products"
               />
             </motion.div>
           </motion.div>
@@ -282,15 +273,15 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Page Views"
-                value={stats.pageViews.toLocaleString()}
+                value={stats.blogs.totalViews}
                 icon={<FaEye />}
                 color="pink"
               />
             </motion.div>
             <motion.div variants={itemVariants}>
               <StatCard
-                title="Pending Orders"
-                value={stats.pendingOrders}
+                title="Pending Quotes"
+                value={stats.quotes.pending}
                 icon={<FaClock />}
                 color="red"
               />
@@ -298,7 +289,7 @@ const Dashboard = () => {
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Completed Quotes"
-                value={stats.quotes - stats.pendingQuotes}
+                value={stats.quotes.accepted}
                 icon={<FaCheckCircle />}
                 color="green"
               />
@@ -321,9 +312,9 @@ const Dashboard = () => {
                 <h3 className="text-lg font-bold text-secondary-900">
                   Recent Messages
                 </h3>
-                {stats.unreadMessages > 0 && (
+                {stats && stats.messages.unread > 0 && (
                   <p className="text-xs text-blue-600 font-semibold mt-1">
-                    {stats.unreadMessages} unread
+                    {stats.messages.unread} unread
                   </p>
                 )}
               </div>
@@ -363,7 +354,7 @@ const Dashboard = () => {
                     <Link
                       to="/admin/messages"
                       className={`flex items-start gap-4 px-6 py-4 transition-colors block ${
-                        !msg.read ? "bg-blue-50" : ""
+                        msg.status === "unread" ? "bg-blue-50" : ""
                       }`}
                     >
                       <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm flex-shrink-0">
@@ -373,13 +364,13 @@ const Dashboard = () => {
                         <div className="flex justify-between items-start">
                           <p
                             className={`text-sm ${
-                              !msg.read
+                              msg.status === "unread"
                                 ? "font-bold text-secondary-900"
                                 : "font-medium text-secondary-700"
                             }`}
                           >
                             {msg.name}
-                            {!msg.read && (
+                            {msg.status === "unread" && (
                               <span className="ml-2 w-2 h-2 bg-primary-600 rounded-full inline-block" />
                             )}
                           </p>
@@ -408,9 +399,9 @@ const Dashboard = () => {
                 <h3 className="text-lg font-bold text-secondary-900">
                   Quote Requests
                 </h3>
-                {stats.pendingQuotes > 0 && (
+                {stats && stats.quotes.pending > 0 && (
                   <p className="text-xs text-amber-600 font-semibold mt-1">
-                    {stats.pendingQuotes} pending
+                    {stats.quotes.pending} pending
                   </p>
                 )}
               </div>
@@ -471,7 +462,7 @@ const Dashboard = () => {
                           </span>
                         </div>
                         <p className="text-xs text-primary-600 font-medium mt-1 truncate">
-                          {quote.productName || "Product Quote"}
+                          {quote.projectType || "Project"}
                         </p>
                         <p className="text-xs text-secondary-500 mt-1">
                           {new Date(quote.createdAt).toLocaleDateString()}
@@ -484,6 +475,41 @@ const Dashboard = () => {
             </div>
           </motion.div>
         </motion.div>
+
+        {/* Quick Stats Summary */}
+        {!loading && stats && (
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white rounded-2xl border border-secondary-200 p-6"
+          >
+            <div className="text-center">
+              <p className="text-2xl font-bold text-primary-600">
+                {stats.products.active}
+              </p>
+              <p className="text-xs text-secondary-600 mt-1">Active Products</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-600">
+                {stats.users.active}
+              </p>
+              <p className="text-xs text-secondary-600 mt-1">Active Users</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-blue-600">
+                {stats.blogs.published}
+              </p>
+              <p className="text-xs text-secondary-600 mt-1">Published Blogs</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-amber-600">
+                {stats.categories.active}
+              </p>
+              <p className="text-xs text-secondary-600 mt-1">
+                Active Categories
+              </p>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </AdminLayout>
   );
