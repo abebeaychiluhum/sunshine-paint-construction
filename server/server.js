@@ -60,6 +60,7 @@ app.use("/api/messages", require("./routes/messages"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/blogs", require("./routes/blogs"));
 app.use("/api/categories", require("./routes/categories"));
+app.use("/api/analytics", require("./routes/analytics"));
 
 const errorHandler = require("./middleware/errorHandler");
 
@@ -135,6 +136,7 @@ const server = app.listen(PORT, () => {
   console.log("");
   console.log("✅ Blogs routes mounted");
   console.log("✅ Categories routes mounted");
+  console.log("✅ Analytics routes mounted");
 });
 
 // Handle unhandled promise rejections
