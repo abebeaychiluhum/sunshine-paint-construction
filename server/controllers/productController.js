@@ -178,3 +178,31 @@ exports.getCategories = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get product stats
+// @route   GET /api/products/stats/overview
+// @access  Private/Admin
+exports.getProductStats = async (req, res, next) => {
+  try {
+    const total = await Product.countDocuments();
+    const active = await Product.countDocuments({ isActive: true });
+    const featured = await Product.countDocuments({ isFeatured: true });
+    const lowStock = await Product.countDocuments({
+      stock: { $lte: 10, $gt: 0 },
+    });
+    const outOfStock = await Product.countDocuments({ stock: 0 });
+
+    res.status(200).json({
+      success: true,
+      count: {
+        total,
+        active,
+        featured,
+        lowStock,
+        outOfStock,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

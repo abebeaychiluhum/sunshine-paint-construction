@@ -153,3 +153,27 @@ exports.deleteMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get message stats
+// @route   GET /api/messages/stats/overview
+// @access  Private/Admin
+exports.getMessageStats = async (req, res, next) => {
+  try {
+    const total = await Message.countDocuments();
+    const unread = await Message.countDocuments({ status: "unread" });
+    const read = await Message.countDocuments({ status: "read" });
+    const replied = await Message.countDocuments({ status: "replied" });
+
+    res.status(200).json({
+      success: true,
+      count: {
+        total,
+        unread,
+        read,
+        replied,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

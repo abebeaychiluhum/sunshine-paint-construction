@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const {
   getProducts,
   getProduct,
@@ -6,21 +7,19 @@ const {
   updateProduct,
   deleteProduct,
   getCategories,
+  getProductStats,
 } = require("../controllers/productController");
 const { protect, authorize } = require("../middleware/auth");
 
-const router = express.Router();
-
+// Public routes
+router.get("/", getProducts);
 router.get("/categories", getCategories);
-router
-  .route("/")
-  .get(getProducts)
-  .post(protect, authorize("admin"), createProduct);
+router.get("/:id", getProduct);
 
-router
-  .route("/:id")
-  .get(getProduct)
-  .put(protect, authorize("admin"), updateProduct)
-  .delete(protect, authorize("admin"), deleteProduct);
+// Admin routes - ADD PROTECTION
+router.post("/", protect, authorize("admin"), createProduct);
+router.put("/:id", protect, authorize("admin"), updateProduct);
+router.delete("/:id", protect, authorize("admin"), deleteProduct);
+router.get("/stats/overview", protect, authorize("admin"), getProductStats);
 
 module.exports = router;

@@ -147,3 +147,27 @@ exports.addNote = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get quote stats
+// @route   GET /api/quotes/stats/overview
+// @access  Private/Admin
+exports.getQuoteStats = async (req, res, next) => {
+  try {
+    const total = await Quote.countDocuments();
+    const pending = await Quote.countDocuments({ status: "pending" });
+    const reviewing = await Quote.countDocuments({ status: "reviewing" });
+    const quoted = await Quote.countDocuments({ status: "quoted" });
+
+    res.status(200).json({
+      success: true,
+      count: {
+        total,
+        pending,
+        reviewing,
+        quoted,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

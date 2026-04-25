@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const {
   createQuote,
   getQuotes,
@@ -8,15 +9,13 @@ const {
 } = require("../controllers/quoteController");
 const { protect, authorize } = require("../middleware/auth");
 
-const router = express.Router();
+// Public route
+router.post("/", createQuote);
 
-router.route("/").post(createQuote).get(protect, authorize("admin"), getQuotes);
-
-router
-  .route("/:id")
-  .get(protect, authorize("admin"), getQuote)
-  .put(protect, authorize("admin"), updateQuote);
-
+// Admin routes - ADD PROTECTION
+router.get("/", protect, authorize("admin"), getQuotes);
+router.get("/:id", protect, authorize("admin"), getQuote);
+router.put("/:id", protect, authorize("admin"), updateQuote);
 router.post("/:id/notes", protect, authorize("admin"), addNote);
 
 module.exports = router;
