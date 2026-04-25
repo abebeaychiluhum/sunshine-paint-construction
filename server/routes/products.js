@@ -17,9 +17,9 @@ router.get("/categories", getCategories);
 router.get("/:id", getProduct);
 
 // Admin routes - ADD PROTECTION
+router.get("/stats/overview", protect, authorize("admin"), getProductStats);
 router.post("/", protect, authorize("admin"), createProduct);
 router.put("/:id", protect, authorize("admin"), updateProduct);
 router.delete("/:id", protect, authorize("admin"), deleteProduct);
-router.get("/stats/overview", protect, authorize("admin"), getProductStats);
 
 module.exports = router;

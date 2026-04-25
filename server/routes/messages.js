@@ -13,6 +13,7 @@ const { protect, authorize } = require("../middleware/auth"); // ADD THIS
 router.post("/", createMessage);
 
 // Admin routes - ADD PROTECTION
+router.get("/stats/overview", protect, authorize("admin"), getMessageStats);
 router.get("/", protect, authorize("admin"), getMessages);
 router.get("/:id", protect, authorize("admin"), getMessage);
 router.post("/:id/reply", protect, authorize("admin"), replyMessage);
