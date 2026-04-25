@@ -31,6 +31,7 @@ import Dashboard from "./admin/pages/Dashboard";
 import AdminRoute from "./admin/components/AdminRoute";
 import AdminProducts from "./admin/pages/AdminProducts";
 import AdminMessages from "./admin/pages/AdminMessages";
+import AdminQuotes from "./admin/pages/AdminQuotes";
 
 function App() {
   return (
@@ -79,6 +80,14 @@ function App() {
                     element={
                       <AdminRoute>
                         <AdminMessages />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/quotes"
+                    element={
+                      <AdminRoute>
+                        <AdminQuotes />
                       </AdminRoute>
                     }
                   />
